@@ -81,6 +81,26 @@
 
             <td class="td flex justify-center gap-6">
 
+                <!-- VIEW -->
+                <div class="relative group">
+                <button
+                    (click)="viewCustomer(customer.id)"
+                    class="text-blue-600 hover:text-blue-800 transition"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        class="w-5 h-5">
+                    <path d="M12 4.5c-7 0-10 7.5-10 7.5s3 7.5 10 7.5 10-7.5 10-7.5-3-7.5-10-7.5zm0 12.75a5.25 5.25 0 110-10.5 5.25 5.25 0 010 10.5z"/>
+                    <path d="M12 9.75a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z"/>
+                    </svg>
+                </button>
+
+                <span class="tooltip">
+                    View
+                </span>
+                </div>
+
                 <!-- EDIT -->
                 <div class="relative group">
                     <button
@@ -189,18 +209,20 @@
             <label class="label">First Name</label>
 
             <input
-                class="input w-full pr-10"
-                type="text"
-                name="first_name"
-                [(ngModel)]="formData.first_name"
-                #firstName="ngModel"
-                required
+            class="input w-full pr-10"
+            type="text"
+            name="first_name"
+            [(ngModel)]="formData.first_name"
+            #firstName="ngModel"
+            required
+            pattern="^[A-Za-z\s\-]+$"
+            (keydown)="blockNameKeys($event)"
             >
 
-            <!-- Green Check -->
+            <!-- Valid -->
             <svg *ngIf="isFieldValid(firstName)"
                 xmlns="http://www.w3.org/2000/svg"
-                class="w-5 h-5 text-emerald-500 absolute right-3 top-[38px] animate-fade-in"
+                class="w-5 h-5 text-emerald-500 absolute right-3 top-[38px]"
                 viewBox="0 0 20 20"
                 fill="currentColor">
                 <path fill-rule="evenodd"
@@ -208,23 +230,32 @@
                     clip-rule="evenodd"/>
             </svg>
 
-            <p *ngIf="firstName.invalid && firstName.touched"
+            <!-- Required -->
+            <p *ngIf="firstName.errors?.['required'] && firstName.touched"
                 class="text-sm text-red-500 mt-1">
                 First name is required.
             </p>
-        </div>
+
+            <!-- Pattern -->
+            <p *ngIf="firstName.errors?.['pattern'] && firstName.touched"
+                class="text-sm text-red-500 mt-1">
+                Only letters, spaces and hyphens are allowed.
+            </p>
+            </div>
 
         <!-- Last Name -->
         <div class="relative">
             <label class="label">Last Name</label>
 
-            <input
-                class="input w-full pr-10"
-                type="text"
-                name="last_name"
-                [(ngModel)]="formData.last_name"
-                #lastName="ngModel"
-                required
+           <input
+            class="input w-full pr-10"
+            type="text"
+            name="last_name"
+            [(ngModel)]="formData.last_name"
+            #lastName="ngModel"
+            required
+            pattern="^[A-Za-z\s\-]+$"
+            (keydown)="blockNameKeys($event)"
             >
 
             <!-- Green Check -->
@@ -254,21 +285,23 @@
                 type="email"
                 name="email"
                 [(ngModel)]="formData.email"
+                (ngModelChange)="emailExistsError = false"
                 #email="ngModel"
                 required
                 email
             >
 
-            <!-- Green Check -->
-            <svg *ngIf="isFieldValid(email) && !emailExistsError"
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-5 h-5 text-emerald-500 absolute right-3 top-[38px] animate-fade-in"
-                viewBox="0 0 20 20"
-                fill="currentColor">
-                <path fill-rule="evenodd"
-                    d="M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.42 0l-3.5-3.5a1 1 0 111.42-1.42l2.79 2.79 6.79-6.79a1 1 0 011.42 0z"
-                    clip-rule="evenodd"/>
-            </svg>
+            <!-- Required / Invalid Format -->
+            <p *ngIf="email.invalid && email.touched"
+                class="text-sm text-red-500 mt-1">
+                Valid email is required.
+            </p>
+
+            <!-- Duplicate Email -->
+            <p *ngIf="emailExistsError"
+                class="text-sm text-red-500 mt-1">
+                Email already exists.
+            </p>
         </div>
 
         <!-- Contact -->
@@ -396,4 +429,59 @@
 
   </div>
 
+</div>
+
+<!-- VIEW CUSTOMER MODAL -->
+<div *ngIf="showViewModal"
+     class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 animate-modal">
+
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-semibold text-gray-800">
+        Customer Details
+      </h2>
+
+      <button
+        (click)="closeViewModal()"
+        class="text-gray-400 hover:text-gray-600 transition"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="space-y-4 text-gray-700">
+
+      <div>
+        <span class="font-medium">First Name:</span>
+        {{ viewingCustomer?.first_name }}
+      </div>
+
+      <div>
+        <span class="font-medium">Last Name:</span>
+        {{ viewingCustomer?.last_name }}
+      </div>
+
+      <div>
+        <span class="font-medium">Email:</span>
+        {{ viewingCustomer?.email }}
+      </div>
+
+      <div>
+        <span class="font-medium">Contact Number:</span>
+        {{ viewingCustomer?.contact_number }}
+      </div>
+
+    </div>
+
+    <div class="flex justify-end mt-6">
+      <button
+        (click)="closeViewModal()"
+        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+      >
+        Close
+      </button>
+    </div>
+
+  </div>
 </div>

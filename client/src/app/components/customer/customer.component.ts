@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CustomerService } from '../../services/customer.service';
 import { Subject, debounceTime } from 'rxjs';
+import { Customer } from '../../models/customer.model';
 
 @Component({
   selector: 'app-customer',
@@ -8,7 +9,7 @@ import { Subject, debounceTime } from 'rxjs';
 })
 export class CustomerComponent implements OnInit {
 
-  customers: any[] = [];
+  customers: Customer[] = [];
   searchTerm: string = '';
 
   loading: boolean = false;
@@ -67,6 +68,8 @@ export class CustomerComponent implements OnInit {
 
   showMaxDigitsTooltip: boolean = false;
 
+  showViewModal: boolean = false;
+  viewingCustomer: Customer | null = null;
 
   constructor(private customerService: CustomerService) {}
 
@@ -86,15 +89,16 @@ export class CustomerComponent implements OnInit {
 
     this.customerService.getCustomers(this.searchTerm)
       .subscribe({
-        next: (data) => {
-          this.customers = data;
-          this.loading = false;
-        },
+       next: (res) => {
+        this.customers = res.data;
+        this.loading = false;
+      },
         error: () => {
           this.loading = false;
         }
       });
   }
+
 
   onSearch(): void {
     this.searchSubject.next(this.searchTerm);
@@ -145,13 +149,17 @@ export class CustomerComponent implements OnInit {
         this.closeModal();
         this.loadCustomers();
       },
-      error: (err) => {
-        this.loading = false;
+     error: (err) => {
+      this.loading = false;
 
-        if (err.status === 422 && err.error?.errors?.email) {
+      if (err.status === 422) {
+        const validationErrors = err.error?.errors;
+
+        if (validationErrors && validationErrors['email']) {
           this.emailExistsError = true;
         }
       }
+    }
     });
   }
 
@@ -340,6 +348,39 @@ export class CustomerComponent implements OnInit {
     this.formatPhoneInput();
   }
 
+  viewCustomer(id: number): void {
+    this.customerService.getCustomer(id).subscribe({
+     next: (res) => {
+      this.viewingCustomer = res.data;
+      this.showViewModal = true;
+    },
+      error: () => {
+        // Handle error if needed
+      }
+    });
+  }
+
+  closeViewModal(): void {
+    this.viewingCustomer = null;
+    this.showViewModal = false;
+  }
+
+  blockNameKeys(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'ArrowLeft',
+      'ArrowRight',
+      'Tab'
+    ];
+
+    if (allowedKeys.includes(event.key)) return;
+
+    // Allow letters, space, and hyphen only
+    if (!/^[A-Za-z\s\-]$/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
 
   get paginatedCustomers() {
     const start = (this.currentPage - 1) * this.itemsPerPage;
