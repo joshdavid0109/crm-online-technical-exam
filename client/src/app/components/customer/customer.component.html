@@ -1,0 +1,399 @@
+<div class="min-h-screen bg-gray-100 p-8">
+
+  <!-- Header -->
+ <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+
+    <div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
+        Customer CRM
+        </h1>
+        <p class="text-gray-500 text-sm sm:text-base">
+        Manage and organize your customers
+        </p>
+    </div>
+
+    <button
+        (click)="openModal()"
+        class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition w-full sm:w-auto"
+    >
+        <svg xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor">
+        <path stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4" />
+        </svg>
+        Add Customer
+    </button>
+
+    </div>
+
+  <!-- Search -->
+  <div class="mb-6">
+    <input
+      class="input w-full"
+      type="text"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearch()"
+      placeholder="Search customers..."
+    >
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading"
+       class="flex justify-center my-6">
+    <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-600 border-solid"></div>
+  </div>
+
+  <!-- Table -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="w-full overflow-x-auto">
+
+        <table class="min-w-[700px] w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+            <th class="th">Name</th>
+            <th class="th">Email</th>
+            <th class="th">Contact</th>
+            <th class="th text-center">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-100">
+
+            <tr *ngFor="let customer of paginatedCustomers"
+                class="hover:bg-gray-50 transition">
+
+            <td class="td font-medium">
+                {{ customer.first_name }} {{ customer.last_name }}
+            </td>
+
+            <td class="td">
+                {{ customer.email }}
+            </td>
+
+            <td class="td">
+                {{ customer.contact_number }}
+            </td>
+
+            <td class="td flex justify-center gap-6">
+
+                <!-- EDIT -->
+                <div class="relative group">
+                    <button
+                    (click)="editCustomer(customer)"
+                    class="text-emerald-600 hover:text-emerald-800 transition"
+                    >
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        class="w-5 h-5">
+                        <path d="M16.862 3.487a2.25 2.25 0 013.182 3.182l-9.193 9.193a4.5 4.5 0 01-1.897 1.11l-3.284.938a.75.75 0 01-.926-.926l.938-3.284a4.5 4.5 0 011.11-1.897l9.193-9.193z" />
+                    </svg>
+                    </button>
+
+                    <span class="tooltip">
+                    Edit
+                    </span>
+                </div>
+
+                <!-- DELETE -->
+                <div class="relative group">
+                    <button
+                    (click)="deleteCustomer(customer.id)"
+                    class="text-red-600 hover:text-red-800 transition"
+                    >
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        class="w-5 h-5">
+                        <path fill-rule="evenodd"
+                            d="M9 3.75A1.5 1.5 0 0110.5 2.25h3A1.5 1.5 0 0115 3.75V4.5h4.125a.75.75 0 010 1.5H18.6l-.833 12.488A2.25 2.25 0 0115.523 20.25H8.477a2.25 2.25 0 01-2.244-1.762L5.4 6H4.875a.75.75 0 010-1.5H9V3.75zM10.5 4.5v-.75h3v.75h-3z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    </button>
+
+                    <span class="tooltip">
+                    Delete
+                    </span>
+                </div>
+
+                </td>
+
+            </tr>
+
+        </tbody>
+        </table>
+
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-center gap-3 mt-6 mb-10">
+
+        <button
+        (click)="currentPage = currentPage - 1"
+        [disabled]="currentPage === 1"
+        class="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+        >
+        Prev
+        </button>
+
+        <span class="px-3 py-1">
+        Page {{ currentPage }} of {{ totalPages }}
+        </span>
+
+        <button
+        (click)="currentPage = currentPage + 1"
+        [disabled]="currentPage === totalPages"
+        class="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+        >
+        Next
+        </button>
+
+    </div>
+
+    </div>
+</div>
+
+<!-- MODAL -->
+<div *ngIf="showModal"
+     class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8
+              animate-modal">
+
+    <!-- Modal Header -->
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-semibold text-gray-800">
+        {{ editingId ? 'Edit Customer' : 'Add Customer' }}
+      </h2>
+
+      <button
+        (click)="closeModal()"
+        class="text-gray-400 hover:text-gray-600 transition"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Form -->
+    <form #customerForm="ngForm"
+            (ngSubmit)="submitForm(customerForm)"
+            class="space-y-5">
+
+        <!-- First Name -->
+        <div class="relative">
+            <label class="label">First Name</label>
+
+            <input
+                class="input w-full pr-10"
+                type="text"
+                name="first_name"
+                [(ngModel)]="formData.first_name"
+                #firstName="ngModel"
+                required
+            >
+
+            <!-- Green Check -->
+            <svg *ngIf="isFieldValid(firstName)"
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5 text-emerald-500 absolute right-3 top-[38px] animate-fade-in"
+                viewBox="0 0 20 20"
+                fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.42 0l-3.5-3.5a1 1 0 111.42-1.42l2.79 2.79 6.79-6.79a1 1 0 011.42 0z"
+                    clip-rule="evenodd"/>
+            </svg>
+
+            <p *ngIf="firstName.invalid && firstName.touched"
+                class="text-sm text-red-500 mt-1">
+                First name is required.
+            </p>
+        </div>
+
+        <!-- Last Name -->
+        <div class="relative">
+            <label class="label">Last Name</label>
+
+            <input
+                class="input w-full pr-10"
+                type="text"
+                name="last_name"
+                [(ngModel)]="formData.last_name"
+                #lastName="ngModel"
+                required
+            >
+
+            <!-- Green Check -->
+            <svg *ngIf="isFieldValid(lastName)"
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5 text-emerald-500 absolute right-3 top-[38px] animate-fade-in"
+                viewBox="0 0 20 20"
+                fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.42 0l-3.5-3.5a1 1 0 111.42-1.42l2.79 2.79 6.79-6.79a1 1 0 011.42 0z"
+                    clip-rule="evenodd"/>
+            </svg>
+
+            <p *ngIf="lastName.invalid && lastName.touched"
+                class="text-sm text-red-500 mt-1">
+                Last name is required.
+            </p>
+        </div>
+
+
+        <!-- Email -->
+       <div class="relative">
+            <label class="label">Email</label>
+
+            <input
+                class="input w-full pr-10"
+                type="email"
+                name="email"
+                [(ngModel)]="formData.email"
+                #email="ngModel"
+                required
+                email
+            >
+
+            <!-- Green Check -->
+            <svg *ngIf="isFieldValid(email) && !emailExistsError"
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5 text-emerald-500 absolute right-3 top-[38px] animate-fade-in"
+                viewBox="0 0 20 20"
+                fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.42 0l-3.5-3.5a1 1 0 111.42-1.42l2.79 2.79 6.79-6.79a1 1 0 011.42 0z"
+                    clip-rule="evenodd"/>
+            </svg>
+        </div>
+
+        <!-- Contact -->
+        <div>
+            <label class="label">Contact Number</label>
+
+            <div class="relative">
+
+                <div class="flex gap-2">
+
+                    <select
+                    [(ngModel)]="formData.contact_prefix"
+                    name="contact_prefix"
+                    (change)="onPrefixChange()"
+                    class="input w-32"
+                    >
+                    <option *ngFor="let c of countries"
+                            [value]="c.code">
+                        {{ c.label }}
+                    </option>
+                    </select>
+
+                    <input
+                    class="input flex-1"
+                    type="text"
+                    name="contact_number"
+                    [(ngModel)]="formData.contact_number"
+                    (input)="formatPhoneInput()"
+                    (keydown)="blockInvalidKeys($event)"
+                    (paste)="handlePaste($event)"
+                    inputmode="numeric"
+                    placeholder="Enter number"
+                    >
+
+                </div>
+
+                <!-- Subtle Max Tooltip -->
+                <div *ngIf="showMaxDigitsTooltip"
+                    class="absolute right-0 -top-8 bg-gray-800 text-white text-xs px-3 py-1 rounded-md shadow-md animate-fade-in">
+                    Maximum {{ selectedCountry?.length }} digits reached
+                </div>
+
+                </div>
+
+
+            <p *ngIf="phoneLengthError"
+                class="text-sm text-red-500 mt-1">
+                Phone number must be {{ selectedCountry?.length }} digits.
+            </p>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4">
+
+            <button
+            type="button"
+            (click)="closeModal()"
+            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+            >
+            Cancel
+            </button>
+
+            <button
+            type="submit"
+            [disabled]="customerForm.invalid || loading"
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition disabled:opacity-50"
+            >
+            {{ editingId ? 'Update' : 'Create' }}
+            </button>
+
+        </div>
+
+    </form>
+
+
+  </div>
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div *ngIf="showDeleteModal"
+     class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-modal">
+
+    <div class="flex items-center gap-3 mb-4">
+
+      <!-- Warning Icon -->
+      <div class="bg-red-100 text-red-600 p-3 rounded-full">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             fill="currentColor"
+             viewBox="0 0 24 24"
+             class="w-6 h-6">
+          <path fill-rule="evenodd"
+                d="M9.401 1.403a2.25 2.25 0 013.198 0l8.998 8.998a2.25 2.25 0 010 3.198l-8.998 8.998a2.25 2.25 0 01-3.198 0L.403 13.599a2.25 2.25 0 010-3.198l8.998-8.998zM12 7.75a.75.75 0 00-.75.75v4a.75.75 0 001.5 0v-4a.75.75 0 00-.75-.75zm0 8a1 1 0 100-2 1 1 0 000 2z"
+                clip-rule="evenodd" />
+        </svg>
+      </div>
+
+      <h3 class="text-lg font-semibold text-gray-800">
+        Delete Customer
+      </h3>
+
+    </div>
+
+    <p class="text-gray-600 mb-6">
+      This action cannot be undone. Are you sure you want to delete this customer?
+    </p>
+
+    <div class="flex justify-end gap-3">
+
+      <button
+        (click)="cancelDelete()"
+        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+      >
+        Cancel
+      </button>
+
+      <button
+        (click)="confirmDelete()"
+        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-sm transition"
+      >
+        Delete
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

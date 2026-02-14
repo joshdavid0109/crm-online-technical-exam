@@ -1,0 +1,102 @@
+.crm-container {
+  max-width: 1000px;
+  margin: 40px auto;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+.form-grid {
+  display: grid;
+  gap: 10px;
+}
+
+input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.secondary {
+  background: #e5e7eb;
+}
+
+.edit {
+  background: #10b981;
+  color: white;
+}
+
+.delete {
+  background: #ef4444;
+  color: white;
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  text-align: left;
+  background: #f9fafb;
+}
+
+.alert {
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.error {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+.loading {
+  text-align: center;
+  margin: 20px 0;
+}

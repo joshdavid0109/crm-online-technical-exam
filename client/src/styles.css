@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer components {
+  .input {
+    @apply px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition;
+  }
+
+  .th {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+  }
+
+  .td {
+    @apply px-6 py-4 text-sm text-gray-700;
+  }
+  .tooltip {
+    @apply absolute -top-8 left-1/2 -translate-x-1/2
+           px-2 py-1 text-xs rounded-md
+           bg-gray-800 text-white
+           opacity-0 scale-95
+           pointer-events-none
+           transition-all duration-150;
+  }
+
+  .group:hover .tooltip {
+    @apply opacity-100 scale-100;
+  }
+}
+
+
+@layer utilities {
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+
+  @keyframes scaleIn {
+    from {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+   .animate-fade-in {
+    animation: fadeIn 0.15s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+}
