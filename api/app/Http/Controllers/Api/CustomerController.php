@@ -15,12 +15,17 @@ class CustomerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+   public function index(Request $request)
     {
-        if ($request->filled('search') && $this->elasticsearch) {
+        if ($request->filled('search')) {
             try {
                 $results = $this->elasticsearch->search($request->search);
-                return CustomerResource::collection(collect($results));
+
+                $customers = collect($results)->map(function ($item) {
+                    return new Customer($item);
+                });
+
+                return CustomerResource::collection($customers);
             } catch (\Exception $e) {
                 \Log::error('Elasticsearch search failed: ' . $e->getMessage());
                 return response()->json(['error' => 'Search failed'], 500);
@@ -29,6 +34,7 @@ class CustomerController extends Controller
 
         return CustomerResource::collection(Customer::all());
     }
+
 
     /**
      * Store a newly created resource in storage.
