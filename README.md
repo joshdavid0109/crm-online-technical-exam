@@ -4,7 +4,7 @@ A Dockerized full-stack CRM application built with modern development practices.
 
 **Tech Stack**
 
-**Backend: **Laravel 10 (PHP-FPM)
+_**Backend:**_ Laravel 10 (PHP-FPM)
 
 **Frontend:** Angular 17
 
