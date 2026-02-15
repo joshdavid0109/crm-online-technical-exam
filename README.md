@@ -1,22 +1,22 @@
-CRM Technical Exam
+_**CRM Technical Exam**_
 
 A Dockerized full-stack CRM application built with modern development practices.
 
-🧱 Tech Stack
+**Tech Stack**
 
-Backend: Laravel 10 (PHP-FPM)
+**Backend: **Laravel 10 (PHP-FPM)
 
-Frontend: Angular 17
+**Frontend:** Angular 17
 
-Database: MySQL 8
+**Database:** MySQL 8
 
-Search Engine: Elasticsearch 8
+**Search Engine:** Elasticsearch 8
 
-Web Server: Nginx (reverse proxy)
+**Web Server:** Nginx (reverse proxy)
 
-Containerization: Docker Compose
+**Containerization:** Docker Compose
 
-🏗 Architecture
+**Architecture**
 Browser
    ↓
 Nginx (controller)
@@ -26,37 +26,35 @@ Nginx (controller)
                     └── Elasticsearch
 
 
-Highlights:
+**Highlights:**
 
-Angular is built and served via Nginx
+   Angular is built and served via Nginx
+   Laravel runs in a dedicated PHP-FPM container
+   Elasticsearch handles full-text search
+   Services are isolated and orchestrated via Docker Compose
 
-Laravel runs in a dedicated PHP-FPM container
-
-Elasticsearch handles full-text search
-
-Services are isolated and orchestrated via Docker Compose
-
-⚙️ How To Run
-1️⃣ Clone the repository
+**How To Run**
+1️. Clone the repository
 git clone <repository-url>
 cd crm-online-technical-exam
 
-2️⃣ Start the containers
+2️. Start the containers
 docker compose up --build
 
-3️⃣ Run migrations
+3️. Run migrations
 docker exec -it crm_api sh
 php artisan migrate --force
 
-4️⃣ Access the application
+4️. Access the application
 
-Frontend: http://localhost:8000
+_**Frontend:** _http://localhost:8000
 
-API Base URL: http://localhost:8000/api
+_**API Base URL:**_ http://localhost:8000/api
 
-Elasticsearch: http://localhost:9200
+_**Elasticsearch:**_ http://localhost:9200
 
-📡 API Endpoints
+
+**API Endpoints**
 
 GET /api/customers
 
@@ -68,61 +66,44 @@ DELETE /api/customers/{id}
 
 GET /api/customers?search=keyword
 
-🔍 Search Implementation
 
-Powered by Elasticsearch
+_**Search Implementation**_
 
-Uses multi_match query
+   - Elasticsearch
+   - Uses multi_match query
 
-Supports:
+_**Supports:**_
+   - Partial word search
+   - First-letter matching
 
-Partial word search
-
-First-letter matching
-
-Automatically syncs on:
-
+_**Automatically syncs on:**_
 Create
-
 Update
-
 Delete
 
-Gracefully handles Elasticsearch failures
 
-✅ Validation Rules
+_**Validation Rules**_
+   - Email must be unique
+   - Database-level constraint
 
-Email must be unique
+_**Request validation rule**_
+   - First & Last Name
+   - Letters
+   - Spaces
+   - Hyphens only
+   - Phone number
 
-Database-level constraint
+_**Validated per selected country format**_
 
-Request validation rule
-
-First & Last Name
-
-Letters
-
-Spaces
-
-Hyphens only
-
-Phone number
-
-Validated per selected country format
-
-🧪 Testing
+_**Testing**_
 
 Run tests inside container:
 
-docker exec -it crm_api php artisan test
+**docker exec -it crm_api php artisan test**
 
 
 Includes:
-
 Feature tests for CRUD
-
 Search endpoint tests
-
 Elasticsearch mocked during tests
-
 Database isolation in testing environment
