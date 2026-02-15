@@ -1,11 +1,31 @@
 # ==============================
 # Stage 1 — Composer Builder
 # ==============================
-FROM composer:2 AS builder
+FROM php:8.2-cli-alpine AS builder
+
+# Install system deps
+RUN apk add --no-cache \
+    git \
+    unzip \
+    curl \
+    libzip-dev \
+    oniguruma-dev \
+    icu-dev
+
+# Install PHP extensions needed by Laravel
+RUN docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    zip \
+    intl \
+    mbstring
+
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Copy only composer files first (better layer caching)
+# Copy composer files first
 COPY api/composer.json api/composer.lock ./
 
 RUN composer install \
@@ -13,31 +33,32 @@ RUN composer install \
     --optimize-autoloader \
     --no-interaction \
     --no-progress \
-    --prefer-dist
+    --prefer-dist \
+    --no-scripts
 
 # ==============================
 # Stage 2 — Production PHP
 # ==============================
 FROM php:8.2-fpm-alpine
 
-# Install system dependencies
 RUN apk add --no-cache \
     bash \
     curl \
     libzip-dev \
     oniguruma-dev \
     icu-dev \
-    mysql-client \
-    && docker-php-ext-install \
-        pdo \
-        pdo_mysql \
-        zip \
-        intl
+    mysql-client
 
-# Enable OPcache (production performance)
+RUN docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    zip \
+    intl \
+    mbstring
+
 RUN docker-php-ext-enable opcache
 
-# Configure OPcache
+# OPcache tuning
 RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.memory_consumption=128" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.max_accelerated_files=10000" >> /usr/local/etc/php/conf.d/opcache.ini \
@@ -45,16 +66,11 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
 
 WORKDIR /var/www
 
-# Copy Laravel app
 COPY api/ .
-
-# Copy vendor from builder stage
 COPY --from=builder /app/vendor ./vendor
 
-# Set correct permissions
 RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Switch to non-root user
 USER www-data
 
 EXPOSE 9000
