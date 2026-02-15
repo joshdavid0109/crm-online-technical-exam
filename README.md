@@ -47,11 +47,12 @@ php artisan migrate --force
 
 4️. Access the application
 
-_**Frontend:** _http://localhost:8000
+_**Frontend:**_ http://localhost:8000
 
 _**API Base URL:**_ http://localhost:8000/api
 
 _**Elasticsearch:**_ http://localhost:9200
+
 
 
 **API Endpoints**
