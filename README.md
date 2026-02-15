@@ -4,7 +4,7 @@ A Dockerized full-stack CRM application built with modern development practices.
 
 **Tech Stack**
 
-_**Backend:**_ Laravel 10 (PHP-FPM)
+**Backend:** Laravel 10 (PHP-FPM)
 
 **Frontend:** Angular 17
 
@@ -34,6 +34,7 @@ Nginx (controller)
    Services are isolated and orchestrated via Docker Compose
 
 **How To Run**
+
 1️. Clone the repository
 git clone <repository-url>
 cd crm-online-technical-exam
@@ -78,9 +79,10 @@ _**Supports:**_
    - First-letter matching
 
 _**Automatically syncs on:**_
-Create
-Update
-Delete
+   
+   - Create
+   - Update
+   - Delete
 
 
 _**Validation Rules**_
